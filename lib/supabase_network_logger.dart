@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/widgets.dart'; // 👈 Added this
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_network_logger/src/models/user_context_model.dart';
 
 import 'src/models/log_entry.dart';
 import 'src/network/sync_manager.dart';
@@ -19,6 +20,7 @@ class SupabaseNetworkLogger {
   static Map<String, dynamic>? _cachedDeviceInfo;
   static Map<String, dynamic>? _cachedAppInfo;
   static Map<String, dynamic>? _globalExtra;
+  static UserContext Function()? _userProvider;
 
   /// Initialize the logger. Should be called in main().
   static Future<void> init({
@@ -27,10 +29,12 @@ class SupabaseNetworkLogger {
     required String supabaseAnonKey,
     String Function()? screenProvider,
     Map<String, dynamic>? globalExtra, // 👈 Added global metadata support
+    UserContext Function()? userProvider,
   }) async {
     _appName = appName;
     _screenProvider = screenProvider;
     _globalExtra = globalExtra;
+    _userProvider = userProvider;
 
     // Initialize Supabase
     await Supabase.initialize(
@@ -67,6 +71,7 @@ class SupabaseNetworkLogger {
     String? userId,
     String? mobile,
   }) async {
+    final user = _userProvider?.call();
     final resolvedScreenName = screenName ??
         _screenProvider?.call() ??
         _currentScreen ??
@@ -93,8 +98,8 @@ class SupabaseNetworkLogger {
         ...?extra, // 👈 Local metadata (specific to this log)
       },
       tag: tag,
-      userId: userId,
-      mobile: mobile,
+      userId: userId ?? user?.userId,
+      mobile: mobile ?? user?.mobile,
     );
 
     await LogStorage.saveLog(log);
