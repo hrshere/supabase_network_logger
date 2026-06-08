@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:crypto/crypto.dart';
 import 'package:flutter/widgets.dart'; // 👈 Added this
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -62,11 +63,14 @@ class SupabaseNetworkLogger {
     String? traceId,
     String? screenName,
     Map<String, dynamic>? extra,
+    String? tag,
+    String? userId,
+    String? mobile,
   }) async {
-    final resolvedScreenName = screenName ?? 
-                             _screenProvider?.call() ?? 
-                             _currentScreen ?? 
-                             'App Launch'; // 👈 Fallback for early errors
+    final resolvedScreenName = screenName ??
+        _screenProvider?.call() ??
+        _currentScreen ??
+        'App Launch'; // 👈 Fallback for early errors
 
     final log = NetworkLog(
       id: _generateUniqueId(url, errorMessage),
@@ -75,19 +79,22 @@ class SupabaseNetworkLogger {
       url: url,
       method: method,
       statusCode: statusCode,
-      requestBody: requestBody,
-      responseBody: responseBody,
+      requestData: requestBody,
+      apiResponseData: responseBody,
       errorMessage: errorMessage,
       stackTrace: stackTrace,
       traceId: traceId,
       screenName: resolvedScreenName,
       deviceInfo: _cachedDeviceInfo,
-      appInfo: _cachedAppInfo,
+      appVersion: _cachedAppInfo,
       extra: {
         'app_name': _appName,
         ...?_globalExtra, // 👈 Global metadata (Flavor, Env, etc.)
-        ...?extra,       // 👈 Local metadata (specific to this log)
+        ...?extra, // 👈 Local metadata (specific to this log)
       },
+      tag: tag,
+      userId: userId,
+      mobile: mobile,
     );
 
     await LogStorage.saveLog(log);
@@ -135,7 +142,8 @@ class SupabaseLoggerObserver extends NavigatorObserver {
 class _LifecycleObserver extends WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
       // User minimized or closed the app, try to flush logs
       SupabaseNetworkLogger.forceSync();
     }

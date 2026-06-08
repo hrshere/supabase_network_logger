@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../storage/log_storage.dart';
 
 class SyncManager {
@@ -23,7 +25,7 @@ class SyncManager {
   void start() {
     _batchTimer?.cancel();
     _batchTimer = Timer.periodic(batchInterval, (_) => sync());
-    
+
     // Auto-sync when internet restored
     Connectivity().onConnectivityChanged.listen((result) {
       if (result != ConnectivityResult.none) {
@@ -53,11 +55,11 @@ class SyncManager {
 
     try {
       final client = Supabase.instance.client;
-      
+
       // We send all logs in one batch request (Deduplication handled by 'id' primary key)
       final payload = logs.map((l) => l.toJson()).toList();
-      
-      await client.from('network_logs').upsert(payload);
+
+      await client.from('global_api_logs').upsert(payload);
 
       // Success: Clear storage and reset circuit
       await LogStorage.deleteLogs(logs.map((l) => l.id).toList());
@@ -66,8 +68,9 @@ class SyncManager {
       debugPrint('✅ SupabaseLogger: Sync completed');
     } catch (e) {
       _consecutiveFailures++;
-      debugPrint('❌ SupabaseLogger: Sync failed ($_consecutiveFailures/$maxRetries): $e');
-      
+      debugPrint(
+          '❌ SupabaseLogger: Sync failed ($_consecutiveFailures/$maxRetries): $e');
+
       if (_consecutiveFailures >= maxRetries) {
         _circuitBrokenUntil = DateTime.now().add(circuitBreakDuration);
         debugPrint('⚠️ SupabaseLogger: Circuit Breaker OPEN. Waiting 5 mins.');
