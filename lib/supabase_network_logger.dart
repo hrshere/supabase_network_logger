@@ -48,6 +48,7 @@ class SupabaseNetworkLogger {
     _screenProvider = screenProvider;
     _globalExtra = globalExtra;
     _userProvider = userProvider;
+    _tableName = tableName;
 
     // Initialize Supabase
     await Supabase.initialize(
