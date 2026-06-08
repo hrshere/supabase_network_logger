@@ -12,6 +12,7 @@ import 'src/utils/device_info_util.dart';
 
 export 'src/interceptors/dio_interceptor.dart';
 export 'src/models/log_entry.dart';
+export 'src/models/user_context_model.dart';
 
 class SupabaseNetworkLogger {
   static String? _appName;
