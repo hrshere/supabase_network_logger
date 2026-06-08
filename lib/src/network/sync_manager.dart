@@ -60,7 +60,7 @@ class SyncManager {
       // We send all logs in one batch request (Deduplication handled by 'id' primary key)
       final payload = logs.map((l) => l.toJson()).toList();
 
-      await client.from(SupabaseNetworkLogger.tableName).upsert(payload);
+      await client.from(SupabaseNetworkLogger.tableName).insert(payload);
 
       // Success: Clear storage and reset circuit
       await LogStorage.deleteLogs(logs.map((l) => l.id).toList());
