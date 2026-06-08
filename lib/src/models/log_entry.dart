@@ -64,7 +64,8 @@ class NetworkLog {
       'url': url,
       'method': method,
       'status_code': statusCode,
-      'request_data': requestData != null ? _safeJsonEncode(requestData) : null,
+      'requested_data':
+          requestData != null ? _safeJsonEncode(requestData) : null,
       'api_response_data':
           apiResponseData != null ? _safeJsonEncode(apiResponseData) : null,
       'error_message': errorMessage,
@@ -88,7 +89,7 @@ class NetworkLog {
       url: json['url'] as String?,
       method: json['method'] as String?,
       statusCode: json['status_code'] as int?,
-      requestData: json['request_data'],
+      requestData: json['requested_data'],
       apiResponseData: json['api_response_data'],
       errorMessage: json['error_message'] as String?,
       stackTrace: json['stack_trace'] as String?,

@@ -68,7 +68,7 @@ create table public.global_api_logs (
   method text null,
   status_code integer null,
 
-  request_data jsonb null,
+  requested_data jsonb null,
   api_response_data jsonb null,
 
   error_message text null,
