@@ -98,7 +98,7 @@ class SupabaseNetworkLogger {
         ...?_globalExtra, // 👈 Global metadata (Flavor, Env, etc.)
         ...?extra, // 👈 Local metadata (specific to this log)
       },
-      tag: tag,
+      tag: tag ?? _cachedAppInfo?['package_name'],
       userId: userId ?? user?.userId,
       mobile: mobile ?? user?.mobile,
     );
