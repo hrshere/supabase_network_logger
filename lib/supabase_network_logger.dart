@@ -23,11 +23,23 @@ class SupabaseNetworkLogger {
   static Map<String, dynamic>? _globalExtra;
   static UserContext Function()? _userProvider;
 
+  static String? _tableName;
+
+  static String get tableName {
+    if (_tableName == null) {
+      throw Exception(
+        'SupabaseNetworkLogger not initialized with tableName',
+      );
+    }
+    return _tableName!;
+  }
+
   /// Initialize the logger. Should be called in main().
   static Future<void> init({
     required String appName,
     required String supabaseUrl,
     required String supabaseAnonKey,
+    required String tableName, // 👈 mandatory
     String Function()? screenProvider,
     Map<String, dynamic>? globalExtra, // 👈 Added global metadata support
     UserContext Function()? userProvider,

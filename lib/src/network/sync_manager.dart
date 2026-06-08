@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../supabase_network_logger.dart';
 import '../storage/log_storage.dart';
 
 class SyncManager {
@@ -59,7 +60,7 @@ class SyncManager {
       // We send all logs in one batch request (Deduplication handled by 'id' primary key)
       final payload = logs.map((l) => l.toJson()).toList();
 
-      await client.from('global_api_logs').upsert(payload);
+      await client.from(SupabaseNetworkLogger.tableName).upsert(payload);
 
       // Success: Clear storage and reset circuit
       await LogStorage.deleteLogs(logs.map((l) => l.id).toList());
